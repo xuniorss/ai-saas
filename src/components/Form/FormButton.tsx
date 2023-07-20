@@ -19,13 +19,14 @@ export const FormButton = ({
 }: FormButtonProps) => {
    return (
       <Button
-         {...rest}
+         aria-label={`botão ${label}`}
          className={cn(
             'col-span-12 lg:col-span-2 w-full capitalize',
             className
          )}
          disabled={isDisabled}
          size={size}
+         {...rest}
       >
          {label}
       </Button>
