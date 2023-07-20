@@ -11,14 +11,15 @@ import { UserAvatar } from '@/components/UserAvatar'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
-import { MessageSquare } from 'lucide-react'
+import { Code } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ChatCompletionRequestMessage } from 'openai'
 import { useCallback, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import ReactMarkdown from 'react-markdown'
 import { FormProps, formSchema } from './constants'
 
-export default function ConversationPage() {
+export default function CodePage() {
    const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([])
 
    const router = useRouter()
@@ -43,7 +44,7 @@ export default function ConversationPage() {
 
             const newMessages = [...messages, userMessage]
 
-            const response = await axios.post('/api/conversation', {
+            const response = await axios.post('/api/code', {
                messages: newMessages,
             })
 
@@ -51,7 +52,6 @@ export default function ConversationPage() {
 
             form.reset()
          } catch (error) {
-            //TODO: Open Pro Modal
             console.error(error)
          } finally {
             router.refresh()
@@ -62,19 +62,19 @@ export default function ConversationPage() {
 
    return (
       <article>
-         <Heading.Root ariaLabel="conversation">
+         <Heading.Root ariaLabel="code">
             <Heading.Icon
-               icon={MessageSquare}
-               iconColor="text-violet-500"
-               bgColor="bg-violet-500/10"
+               icon={Code}
+               iconColor="text-green-700"
+               bgColor="bg-green-700/10"
             />
             <Heading.Content
-               title="Conversação"
-               description="Nosso modelo de conversa mais avançado."
+               title="Geração de Código"
+               description="Gere código usando texto descritivo."
             />
          </Heading.Root>
          <div className="px-4 lg:px-8">
-            <div aria-label="conversation-form">
+            <div aria-label="code-form">
                <Form {...form}>
                   <FormCustom.Root onSubmit={form.handleSubmit(onSubmit)}>
                      <FormField
@@ -85,7 +85,7 @@ export default function ConversationPage() {
                                  <Input
                                     className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                                     disabled={isLoading}
-                                    placeholder="Como calcular o raio de um círculo?"
+                                    placeholder="Toggle button simples usando hooks do React"
                                     {...field}
                                  />
                               </FormControl>
@@ -94,45 +94,66 @@ export default function ConversationPage() {
                      />
                      <FormCustom.Button
                         type="submit"
-                        label="Gerar"
                         isDisabled={isLoading}
+                        size="icon"
+                        label="Gerar"
                      />
                   </FormCustom.Root>
                </Form>
             </div>
             <section
-               aria-label="conversation-message-container"
+               aria-label="code-message-container"
                className="space-y-4 mt-4"
             >
-               <article aria-label="message-content" className="space-y-4 mt-4">
-                  {isLoading && (
-                     <div className="p-8 rounded-lg w-full flex items-center justify-center bg-muted">
-                        <Loader />
-                     </div>
-                  )}
-                  {messages.length === 0 && !isLoading && (
-                     <Empty label="Nenhuma conversa começou." />
-                  )}
-                  <div className="flex flex-col-reverse gap-y-4">
-                     {messages.map((message) => (
-                        <div
-                           key={message.content}
-                           className={cn(
-                              'p-8 w-full flex items-start gap-x-8 rounded-lg',
-                              message.role === 'user'
-                                 ? 'bg-white border border-black/10'
-                                 : 'bg-muted'
-                           )}
-                        >
-                           {message.role === 'user' ? (
-                              <UserAvatar />
-                           ) : (
-                              <BotAvatar />
-                           )}
-                           <p className="text-sm">{message.content}</p>
-                        </div>
-                     ))}
+               {isLoading && (
+                  <div className="p-8 rounded-lg w-full flex items-center justify-center bg-muted">
+                     <Loader />
                   </div>
+               )}
+
+               {messages.length === 0 && !isLoading && (
+                  <Empty label="Nenhuma conversa começou." />
+               )}
+
+               <article
+                  aria-label="code-content"
+                  className="flex flex-col-reverse gap-y-4"
+               >
+                  {messages.map((message) => (
+                     <div
+                        key={message.content}
+                        className={cn(
+                           'p-8 w-full flex items-start gap-x-8 rounded-lg',
+                           message.role === 'user'
+                              ? 'bg-white border border-black/10'
+                              : 'bg-muted'
+                        )}
+                     >
+                        {message.role === 'user' ? (
+                           <UserAvatar />
+                        ) : (
+                           <BotAvatar />
+                        )}
+                        <ReactMarkdown
+                           components={{
+                              pre: ({ node, ...props }) => (
+                                 <div className="overflow-auto w-full my-2 bg-black/10 p-2 rounded-lg">
+                                    <pre {...props} />
+                                 </div>
+                              ),
+                              code: ({ node, ...props }) => (
+                                 <code
+                                    className="bg-black/10 rounded-lg p-1"
+                                    {...props}
+                                 />
+                              ),
+                           }}
+                           className="text-sm overflow-hidden leading-7"
+                        >
+                           {message.content || ''}
+                        </ReactMarkdown>
+                     </div>
+                  ))}
                </article>
             </section>
          </div>
