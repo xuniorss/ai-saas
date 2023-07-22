@@ -6,6 +6,7 @@ import { Heading } from '@/components/Heading'
 import { Loader } from '@/components/Loader'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useProModal } from '@/hooks/useProModal'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { Video } from 'lucide-react'
@@ -18,6 +19,7 @@ export default function VideoPage() {
    const [video, setVideo] = useState<string>()
 
    const router = useRouter()
+   const proModal = useProModal()
 
    const form = useForm<FormProps>({
       resolver: zodResolver(formSchema),
@@ -38,13 +40,13 @@ export default function VideoPage() {
 
             setVideo(data[0])
             form.reset()
-         } catch (error) {
-            console.error(error)
+         } catch (error: any) {
+            if (error?.response?.status === 403) proModal.onOpen()
          } finally {
             router.refresh()
          }
       },
-      [form, router]
+      [form, proModal, router]
    )
 
    return (

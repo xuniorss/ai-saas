@@ -15,6 +15,7 @@ import {
    SelectTrigger,
    SelectValue,
 } from '@/components/ui/select'
+import { useProModal } from '@/hooks/useProModal'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import { Download, ImageIcon } from 'lucide-react'
@@ -33,6 +34,7 @@ export default function ImagePage() {
    const [photos, setPhotos] = useState<string[]>([])
 
    const router = useRouter()
+   const proModal = useProModal()
 
    const form = useForm<FormProps>({
       resolver: zodResolver(formSchema),
@@ -53,13 +55,13 @@ export default function ImagePage() {
             const urls = data.map((image: { url: string }) => image.url)
 
             setPhotos(urls)
-         } catch (error) {
-            console.error(error)
+         } catch (error: any) {
+            if (error?.response?.status === 403) proModal.onOpen()
          } finally {
             router.refresh()
          }
       },
-      [router]
+      [proModal, router]
    )
 
    return (

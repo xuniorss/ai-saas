@@ -1,6 +1,7 @@
 'use client'
 
 import { MAX_FREE_COUNTS } from '@/constants'
+import { useProModal } from '@/hooks/useProModal'
 import { Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
@@ -13,8 +14,11 @@ interface FreeCounterProps {
 
 export const FreeCounter = ({ apiLimitCount = 0 }: FreeCounterProps) => {
    const [isMouted, setIsMounted] = useState(false)
+   const proModal = useProModal()
 
    useEffect(() => setIsMounted(true), [])
+
+   if (!isMouted) return null
 
    return (
       <section className="px-3">
@@ -30,6 +34,7 @@ export const FreeCounter = ({ apiLimitCount = 0 }: FreeCounterProps) => {
                   />
                </div>
                <Button
+                  onClick={proModal.onOpen}
                   aria-label="button-upgrade-plan"
                   className="w-full"
                   variant="premium"

@@ -8,6 +8,7 @@ import { Loader } from '@/components/Loader'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { UserAvatar } from '@/components/UserAvatar'
+import { useProModal } from '@/hooks/useProModal'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
@@ -23,6 +24,7 @@ export default function CodePage() {
    const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([])
 
    const router = useRouter()
+   const proModal = useProModal()
 
    const form = useForm<FormProps>({
       resolver: zodResolver(formSchema),
@@ -51,13 +53,13 @@ export default function CodePage() {
             setMessages((current) => [...current, userMessage, response.data])
 
             form.reset()
-         } catch (error) {
-            console.error(error)
+         } catch (error: any) {
+            if (error?.response?.status === 403) proModal.onOpen()
          } finally {
             router.refresh()
          }
       },
-      [form, messages, router]
+      [form, messages, proModal, router]
    )
 
    return (
