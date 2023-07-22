@@ -23,6 +23,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
    amountOptions,
    FormProps,
@@ -57,6 +58,7 @@ export default function ImagePage() {
             setPhotos(urls)
          } catch (error: any) {
             if (error?.response?.status === 403) proModal.onOpen()
+            else toast.error('Algo errado.')
          } finally {
             router.refresh()
          }

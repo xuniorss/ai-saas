@@ -13,6 +13,7 @@ import { Video } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import { FormProps, formSchema } from './constants'
 
 export default function VideoPage() {
@@ -42,6 +43,7 @@ export default function VideoPage() {
             form.reset()
          } catch (error: any) {
             if (error?.response?.status === 403) proModal.onOpen()
+            else toast.error('Algo errado.')
          } finally {
             router.refresh()
          }

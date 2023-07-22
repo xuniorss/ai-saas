@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import { ChatCompletionRequestMessage } from 'openai'
 import { useCallback, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import { FormProps, formSchema } from './constants'
 
 export default function ConversationPage() {
@@ -54,6 +55,7 @@ export default function ConversationPage() {
             form.reset()
          } catch (error: any) {
             if (error?.response?.status === 403) proModal.onOpen()
+            else toast.error('Algo errado.')
          } finally {
             router.refresh()
          }
